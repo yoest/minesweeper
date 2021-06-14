@@ -2,7 +2,7 @@ package view;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class FXLauncher extends Application {
@@ -12,7 +12,12 @@ public class FXLauncher extends Application {
         primaryStage.setTitle("Minesweeper");
         primaryStage.setWidth(1200);
         primaryStage.setHeight(700);
-        primaryStage.setScene(new Scene(new GameView()));
+
+        MenuView menuView = new MenuView();
+        GameView gameView = new GameView(10);
+        HBox hBox = new HBox(menuView, gameView);
+
+        primaryStage.setScene(new Scene(hBox));
 
         primaryStage.show();
     }

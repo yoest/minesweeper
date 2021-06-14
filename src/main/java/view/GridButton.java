@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 
 public class GridButton extends Button {
 
-    private final int SIZE_ITEM = 30;
+    public final int SIZE_ITEM = 40;
     public final int VALUE;
 
     private boolean hide = true;
@@ -24,8 +24,12 @@ public class GridButton extends Button {
 
         this.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        this.setOnMouseEntered(event -> this.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT))));
-        this.setOnMouseExited(event -> this.setBorder(null));
+        this.setOnMouseEntered(event -> {
+            if(hide) this.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        });
+        this.setOnMouseExited(event -> {
+            if(hide) this.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        });
     }
 
     /** Show the button. By default it is hide. */
@@ -35,6 +39,8 @@ public class GridButton extends Button {
 
         switch (VALUE) {
             case -1:
+                this.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+                this.setTextFill(Color.WHITE);
                 this.setText("B");
                 break;
             case 0:

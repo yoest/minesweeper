@@ -5,6 +5,8 @@ public class GridCreator {
     public final int SIZE;
     public final Item[][] GRID;
 
+    private int bombsNumber = 0;
+
     /** Create a grid which represents the board game.
      *
      * @param SIZE is the size of the grid (same width as height).
@@ -32,9 +34,11 @@ public class GridCreator {
      */
     private Item chooseItem() {
         // Change this value to get more bombs.
-        int probabilityOfBomb = 4;
+        int probabilityOfBomb = 3;
 
         int random = Math.round((float) (Math.random() * (probabilityOfBomb - 1)));
+        if(random == 0) bombsNumber++;
+
         return random == 0 ? new Bomb() : new EmptyItem();
     }
 
@@ -56,5 +60,10 @@ public class GridCreator {
                 }
             }
         }
+    }
+
+    /** @return the numbers of bombs on the grid. */
+    public int getBombsNumber() {
+        return bombsNumber;
     }
 }
