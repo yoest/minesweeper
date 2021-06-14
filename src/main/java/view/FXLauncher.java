@@ -12,7 +12,7 @@ public class FXLauncher extends Application {
         primaryStage.setTitle("Minesweeper");
         primaryStage.setWidth(1200);
         primaryStage.setHeight(700);
-        primaryStage.setScene(new Scene(new Pane()));
+        primaryStage.setScene(new Scene(new GameView()));
 
         primaryStage.show();
     }
