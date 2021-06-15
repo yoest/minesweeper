@@ -3,6 +3,8 @@ package model;
 public class GridCreator {
 
     public final int SIZE;
+    public final int BOMB_PROBABILITY;
+
     public final Item[][] GRID;
 
     private int bombsNumber = 0;
@@ -10,9 +12,15 @@ public class GridCreator {
     /** Create a grid which represents the board game.
      *
      * @param SIZE is the size of the grid (same width as height).
+     * @param BOMB_PROBABILITY is the probability of having bombs on the grid.
      */
-    public GridCreator(int SIZE) {
+    public GridCreator(int SIZE, int BOMB_PROBABILITY) {
         this.SIZE = SIZE;
+
+        if(BOMB_PROBABILITY < 11)
+            this.BOMB_PROBABILITY = BOMB_PROBABILITY;
+        else
+            throw new IllegalArgumentException("Bomb probability is to high : " + BOMB_PROBABILITY);
 
         GRID = new Item[SIZE][SIZE];
         generate();
@@ -33,10 +41,7 @@ public class GridCreator {
      * @return the item object (bomb or empty).
      */
     private Item chooseItem() {
-        // Change this value to get more bombs.
-        int probabilityOfBomb = 3;
-
-        int random = Math.round((float) (Math.random() * (probabilityOfBomb - 1)));
+        int random = Math.round((float) (Math.random() * (10 / BOMB_PROBABILITY)));
         if(random == 0) bombsNumber++;
 
         return random == 0 ? new Bomb() : new EmptyItem();

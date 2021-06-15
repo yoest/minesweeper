@@ -14,6 +14,7 @@ public class CustomLabel extends Label {
     public CustomLabel(String text) {
         super(text);
 
+        this.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         this.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         this.setPadding(new Insets(10));
     }

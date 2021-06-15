@@ -2,6 +2,8 @@ package view;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -40,8 +42,8 @@ public class GridButton extends Button {
         switch (VALUE) {
             case -1:
                 this.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
-                this.setTextFill(Color.WHITE);
-                this.setText("B");
+                ImageView imageView = new ImageView(new Image("bomb_ic.png"));
+                this.setGraphic(imageView);
                 break;
             case 0:
                 break;

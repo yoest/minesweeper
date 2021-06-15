@@ -1,35 +1,47 @@
 package view;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import model.CustomTimerTask;
 import model.GridCreator;
 import model.Item;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Timer;
 
 public class GameView extends VBox {
 
     private GridButton[][] GRID;
-    private int lives = 3;
+    private int lives;
 
     private CustomLabel livesNumberLabel;
+
+    private Timer timer;
+    private CustomTimerTask task;
 
     /** Represent the view where the player can play.
      *
      * @param gridSize is the size of the grid.
+     * @param bombProbability is the probability of having bombs on the grid.
+     * @param lives is the numbers of lives of the players.
      */
-    public GameView(int gridSize) {
-        GridCreator creator = new GridCreator(gridSize);
+    public GameView(int gridSize, int bombProbability, int lives) {
+        GridCreator creator = new GridCreator(gridSize, bombProbability);
         GRID = new GridButton[creator.SIZE][creator.SIZE];
+        this.lives = lives;
 
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
@@ -56,18 +68,52 @@ public class GameView extends VBox {
         }
 
         CustomLabel bombsNumberLabel = new CustomLabel("Bombs : " + creator.getBombsNumber());
+        bombsNumberLabel.setMinWidth(GRID[0][0].SIZE_ITEM * 2 + 5);
+        bombsNumberLabel.setAlignment(Pos.CENTER);
         Pane space = new Pane();
         livesNumberLabel = new CustomLabel("Lives : " + lives);
+        livesNumberLabel.setMinWidth(GRID[0][0].SIZE_ITEM * 2 + 5);
+        livesNumberLabel.setAlignment(Pos.CENTER);
         HBox hBox = new HBox(bombsNumberLabel, space, livesNumberLabel);
         HBox.setHgrow(space, Priority.ALWAYS);
         hBox.setPadding(new Insets(10));
 
-        VBox root = new VBox(hBox, gridPane);
+        CustomLabel timerLabel = new CustomLabel("00:00:00");
+        timerLabel.setMinWidth(GRID[0][0].SIZE_ITEM * GRID.length + 5 * (GRID.length - 1));
+        timerLabel.setAlignment(Pos.CENTER);
+        HBox timerBox = new HBox(timerLabel);
+        timerBox.setPadding(new Insets(10));
+
+        timer = new Timer();
+        task = new CustomTimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    timeCounter++;
+                    timerLabel.setText(formatTime(timeCounter));
+                });
+            }
+        };
+        timer.scheduleAtFixedRate(task, 0, 1000);
+
+        VBox root = new VBox(hBox, gridPane, timerBox);
         root.setMaxWidth(GRID[0][0].SIZE_ITEM * GRID.length + 5 * (GRID.length - 1));
 
         this.getChildren().add(root);
         this.setAlignment(Pos.CENTER);
         HBox.setHgrow(this, Priority.ALWAYS);
+    }
+
+    /** Format the timer to get a pretty printing like hh:mm:ss.
+     *
+     * @param value is the value of the counter.
+     * @return
+     */
+    private String formatTime(int value) {
+        int seconds = value % 60;
+        int minutes = (value - seconds) / 60;
+        int hours = (value - 60 * minutes - seconds) / 3600;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
     /** Click on a box on the grid.
@@ -90,10 +136,7 @@ public class GameView extends VBox {
             if(lives == 0) resultDialog(false);
         }
 
-        if(button.VALUE == -1) {
-            // TODO
-            System.out.println("END");
-        } else if(button.VALUE == 0) {
+        if(button.VALUE == 0) {
             // Check the four box around this box.
             if(x > 0)
                 clickOnGrid(x - 1, y);
@@ -126,22 +169,84 @@ public class GameView extends VBox {
      * @param isVictory is the game a victory or not ?
      */
     private void resultDialog(boolean isVictory) {
+        timer.cancel();
+
         Stage stage = new Stage();
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.UNDECORATED);
 
         Label resultLabel = isVictory ? new Label("Well played !") : new Label("Sorry... Maybe next time.");
-        CustomButton restartButton = new CustomButton("Close");
-        restartButton.setOnAction(event -> stage.close());
+        resultLabel.setFont(Font.font(20));
 
-        VBox vBox = new VBox(10, resultLabel, restartButton);
+        int score = countScore();
+        String time = formatTime(task.getTimeCounter());
+
+        Label scoreLabel = new Label("Score : " + score);
+        Label timeLabel = new Label("Time : " + time);
+        VBox resultBox = new VBox(5, scoreLabel, timeLabel);
+
+        CustomButton restartButton = new CustomButton("Close");
+
+        HBox root = (HBox) this.getScene().getRoot();
+        restartButton.setOnAction(event -> {
+            saveScore(score, time);
+
+            closeThread();
+            stage.close();
+            root.getChildren().remove(1);
+        });
+
+        VBox vBox = new VBox(20, resultLabel, resultBox, restartButton);
+        vBox.setPrefSize(400, 200);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(30));
         vBox.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         vBox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
 
+        // Center the stage on the other stage.
+        Window currentStage = this.getScene().getWindow();
+        stage.setX(currentStage.getX() + (currentStage.getWidth() / 2) - 200);
+        stage.setY(currentStage.getY() + (currentStage.getHeight() / 2) - 100);
+
         stage.setScene(new Scene(vBox));
         stage.showAndWait();
+    }
+
+    /** Get the score of the player. It is the number of box discovered multiplied by (2 * number of the box).
+     *
+     * @return score of the player.
+     */
+    private int countScore() {
+        int score = 0;
+
+        for (GridButton[] row : GRID) {
+            for (GridButton button : row) {
+                if(button.VALUE != -1 && !button.isHide())
+                    score += 2 * button.VALUE;
+            }
+        }
+
+        return score;
+    }
+
+    /** Save the score to the score file.
+     *
+     * @param score is the score to save.
+     * @param time is the time of the game.
+     */
+    private void saveScore(int score, String time) {
+        File scoreFile = new File("src/main/resources/score-file.txt");
+
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(scoreFile, true))) {
+            bufferedWriter.write(score + " " + time + "\n");
+        } catch (IOException e) {
+            System.err.println("Cannot open the score file : " + e.getMessage());
+        }
+    }
+
+    /** Close the timer thread to avoid that the application keeps running. */
+    public void closeThread() {
+        timer.cancel();
     }
 }
