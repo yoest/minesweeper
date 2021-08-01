@@ -1,10 +1,23 @@
 # Minesweeper
 
-Implementation of the famous game [Minesweeper](https://fr.wikipedia.org/wiki/D%C3%A9mineur_(genre_de_jeu_vid%C3%A9o)).
+Implementation of the famous game [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game)).
 
 ## Description
 
-This project was created with Java and JavaFX to improve my knowledge of these technologies and to better understand the MVC (Model - View - Controller) pattern.
+This project has been created with Java and JavaFX and represents a simple Minesweeper.
+
+You can play the game and change different parameters:
+- The size of the grid.
+- The probability of having bombs on the grid.
+- The number of lives before losing the game.
+
+![capture-1](./examples/capture-1.png)
+
+You can also view each score and manage previous ones:
+- Clear all scores.
+- Keep only the ten best scores.
+
+![capture-2](./examples/capture-2.png)
 
 ## Getting Started
 
@@ -24,7 +37,7 @@ gradle run
 
 ## Authors
 
-- Yorick Estievenart
+- [Yorick Estievenart](https://github.com/yoest)
 
 ## License
 

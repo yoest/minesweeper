@@ -2,6 +2,7 @@ package view;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class FXLauncher extends Application {
@@ -9,6 +10,7 @@ public class FXLauncher extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Minesweeper");
+        primaryStage.getIcons().add(new Image("app_icon.png"));
         primaryStage.setWidth(1200);
         primaryStage.setHeight(700);
 

@@ -55,7 +55,7 @@ public class IntroView extends BorderPane {
             int size = (int) ((end * frac) + start);
 
             if(size <= end) {
-                this.node.setFont(Font.font(size));
+                this.node.setFont(new Font("Century Gothic", size));
             } else {
                 // At the end, change the scene to play the game.
                 HBox hBox = new HBox(new MenuView());

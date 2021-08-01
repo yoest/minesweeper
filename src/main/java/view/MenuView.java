@@ -16,46 +16,24 @@ import javafx.stage.Window;
 
 public class MenuView extends VBox {
 
+    private Slider[] sliders = new Slider[3];
+    private int sliderIndex = 0;
+
     /** Represent the view where the player can change the settings of the game. */
     public MenuView() {
         this.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         this.setPadding(new Insets(10));
         this.setMinWidth(200);
 
-        // TODO : clean each slider (separated function).
-
-        Label sizeGrid = new Label("Grid size :");
-        Slider sliderSizeGrid = new Slider(5, 12, 1);
-        sliderSizeGrid.setStyle("-fx-focus-color: black;");
-        Label sliderSizeGridValueLabel = new Label(String.valueOf((int) sliderSizeGrid.getValue()));
-        sliderSizeGrid.valueProperty().addListener((observable, oldValue, newValue) -> sliderSizeGridValueLabel.setText(String.valueOf(newValue.intValue())));
-        HBox hBoxSizeGrid = new HBox(5, sliderSizeGrid, sliderSizeGridValueLabel);
-        hBoxSizeGrid.setAlignment(Pos.CENTER);
-        VBox sizeGridBox = new VBox(5, sizeGrid, hBoxSizeGrid);
-
-        Label bombProbability = new Label("Bomb probability :");
-        Slider sliderBombProbability = new Slider(1, 10, 1);
-        sliderBombProbability.setStyle("-fx-focus-color: black;");
-        Label sliderBombProbabilityValueLabel = new Label(String.valueOf((int) sliderBombProbability.getValue()));
-        sliderBombProbability.valueProperty().addListener((observable, oldValue, newValue) -> sliderBombProbabilityValueLabel.setText(String.valueOf(newValue.intValue())));
-        HBox hBoxBombProbability = new HBox(5, sliderBombProbability, sliderBombProbabilityValueLabel);
-        hBoxBombProbability.setAlignment(Pos.CENTER);
-        VBox bombProbabilityBox = new VBox(5, bombProbability, hBoxBombProbability);
-
-        Label numberLives = new Label("Number of lives :");
-        Slider sliderNumberLives = new Slider(1, 5, 1);
-        sliderNumberLives.setStyle("-fx-focus-color: black;");
-        Label sliderNumberLivesValueLabel = new Label(String.valueOf((int) sliderNumberLives.getValue()));
-        sliderNumberLives.valueProperty().addListener((observable, oldValue, newValue) -> sliderNumberLivesValueLabel.setText(String.valueOf(newValue.intValue())));
-        HBox hBoxNumberLives = new HBox(5, sliderNumberLives, sliderNumberLivesValueLabel);
-        hBoxNumberLives.setAlignment(Pos.CENTER);
-        VBox numberLivesBox = new VBox(5, numberLives, hBoxNumberLives);
+        VBox sizeGridBox = this.createSlider("Grid size :", 5, 12);
+        VBox bombProbabilityBox = this.createSlider("Bomb probability :", 1, 10);
+        VBox numberLivesBox = this.createSlider("Number of lives :", 1, 5);
 
         CustomButton scoreButton = new CustomButton("See score");
         scoreButton.setOnAction(event -> seeScore());
 
         CustomButton newGameButton = new CustomButton("New game");
-        newGameButton.setOnAction(event -> generateNewGame((int) sliderSizeGrid.getValue(), (int) sliderBombProbability.getValue(), (int) sliderNumberLives.getValue()));
+        newGameButton.setOnAction(event -> generateNewGame((int) sliders[0].getValue(), (int) sliders[1].getValue(), (int) sliders[2].getValue()));
 
         HBox buttonBox = new HBox(10, scoreButton, newGameButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -63,6 +41,32 @@ public class MenuView extends VBox {
         this.setSpacing(20);
         this.getChildren().addAll(sizeGridBox, bombProbabilityBox, numberLivesBox, buttonBox);
         this.setAlignment(Pos.TOP_CENTER);
+    }
+
+    /** Create a slider box with many component and return the vbox.
+     *
+     * @param text is the text to put as the title of the slider.
+     * @param sliderStart is the first value of the slider.
+     * @param sliderEnd is the last value of the slider.
+     * @return the vbox containing every component.
+     */
+    private VBox createSlider(String text, int sliderStart, int sliderEnd) {
+        Label titleLabel = new Label(text);
+
+        Slider slider = new Slider(sliderStart, sliderEnd, sliderStart);
+        slider.setStyle("-fx-focus-color: black;");
+
+        // Add this sliders to the lists of all sliders.
+        this.sliders[sliderIndex] = slider;
+        sliderIndex++;
+
+        Label valueLabel = new Label(String.valueOf((int) slider.getValue()));
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> valueLabel.setText(String.valueOf(newValue.intValue())));
+
+        HBox hBox = new HBox(5, slider, valueLabel);
+        hBox.setAlignment(Pos.CENTER);
+
+        return new VBox(5, titleLabel, hBox);
     }
 
     /** Generate a new game.
