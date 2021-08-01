@@ -1,13 +1,7 @@
 package view;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class FXLauncher extends Application {
@@ -18,12 +12,12 @@ public class FXLauncher extends Application {
         primaryStage.setWidth(1200);
         primaryStage.setHeight(700);
 
-        MenuView menuView = new MenuView();
-        HBox hBox = new HBox(menuView);
-        hBox.setBackground(new Background(new BackgroundFill(Color.web("#e1e1e1"), CornerRadii.EMPTY, Insets.EMPTY)));
+        IntroView introView = new IntroView();
 
-        primaryStage.setScene(new Scene(hBox));
+        primaryStage.setScene(new Scene(introView));
         primaryStage.show();
+
+        introView.startAnimation();
     }
 
     public static void main(String[] args) {
